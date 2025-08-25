@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300..900&family=Poppins:wght@200..600&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Background image */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 500;
+            width: 100%;
+            height: 100%;
+            background: url('https://wallpapercave.com/wp/wp7201215.jpg') no-repeat center center fixed;
+            background-size: cover;
+            z-index: -1; /* Keeps the background behind the form */
+        }
+
+        .form-container {
+            background: rgba(126, 97, 144, 0.436); /* Transparent background */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.207);
+            max-width: 450px;
+            width: 100%;
+            color: #333;
+            position: center;
+            z-index: 1; /* Keeps the form in front of the overlay */
+        }
+
+        h1 {
+            font-size: 30px;
+            text-align: center;
+            color: #004e7c;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            font-size: 24px;
+            color: #007BFF;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background: #f4f4f4;
+            color: #777;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background and Overlay -->
+    <div class="background"></div>
+    <div class="overlay"></div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h1>CAR PRICE PREDICTION</h1>
+        <form id="prediction-form">
+            <h2>Enter Car Details</h2>
+            <label for="year">Year of Manufacture:</label>
+            <input type="number" id="year" name="year" required>
+
+            <label for="present_price">Present Price (₹ in Lakhs):</label>
+            <input type="number" id="present_price" name="present_price" step="0.1" required>
+
+            <label for="kms_driven">Kilometers Driven:</label>
+            <input type="number" id="kms_driven" name="kms_driven" required>
+
+            <label for="fuel_type">Fuel Type:</label>
+            <select id="fuel_type" name="fuel_type" required>
+                <option value="0">Petrol</option>
+                <option value="1">Diesel</option>
+                <option value="2">CNG</option>
+            </select>
+
+            <label for="owner">Number of Previous Owners:</label>
+            <input type="number" id="owner" name="owner" required>
+
+            <label for="seller_type_individual">Seller Type:</label>
+            <select id="seller_type_individual" name="seller_type_individual" required>
+                <option value="1">Individual</option>
+                <option value="0">Dealer</option>
+            </select>
+
+            <label for="transmission_manual">Transmission:</label>
+            <select id="transmission_manual" name="transmission_manual" required>
+                <option value="1">Manual</option>
+                <option value="0">Automatic</option>
+            </select>
+
+            <button type="submit">Predict Price</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('prediction-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            const resultDiv = document.getElementById('result');
+            if (result.success) {
+                resultDiv.textContent = `Predicted Price: ₹${result.prediction} Lakhs`;
+                resultDiv.style.color = '#28a745'; // Green for success
+            } else {
+                resultDiv.textContent = `Error: ${result.error}`;
+                resultDiv.style.color = 'red'; // Red for error
+            }
+        });
+    </script>
+</body>
+</html>
